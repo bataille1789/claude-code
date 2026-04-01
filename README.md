@@ -64,6 +64,48 @@ Claude Code is Anthropic's official CLI tool for interacting with Claude directl
 
 ---
 
+## 🚀 Rebuilt Multi-Agent CLI
+
+This branch adds a practical multi-agent launcher that wraps the hidden teammate mode flags into one command:
+
+```bash
+claude team
+```
+
+You can also forward normal Claude arguments after `--`:
+
+```bash
+claude team -- -p "Analyze this repo and split tasks across agents"
+```
+
+What it does internally:
+- Re-launches Claude with `--agent-teams`
+- Sets `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- Inherits your terminal/session exactly (stdio passthrough)
+
+You can also wrap this from other tools via a config file:
+
+```yaml
+# team.yaml
+agents:
+  reviewer:
+    description: "Review implementation quality"
+    prompt: "Focus on correctness, edge cases, and maintainability."
+  tester:
+    description: "Design validation steps"
+    prompt: "Propose concrete CLI and regression checks."
+appendSystemPrompt: "Always split independent tasks across teammates."
+claudeArgs:
+  - "--permission-mode"
+  - "acceptEdits"
+```
+
+```bash
+claude team --config ./team.yaml -- -p "Refactor this repository safely"
+```
+
+---
+
 ## � Documentation
 
 For in-depth guides, see the [`docs/`](docs/) directory:
@@ -75,6 +117,7 @@ For in-depth guides, see the [`docs/`](docs/) directory:
 | **[Commands Reference](docs/commands.md)** | All ~85 slash commands organized by category |
 | **[Subsystems Guide](docs/subsystems.md)** | Deep dives into Bridge, MCP, Permissions, Plugins, Skills, Tasks, Memory, Voice |
 | **[Exploration Guide](docs/exploration-guide.md)** | How to navigate the codebase — study paths, grep patterns, key files |
+| **[Gateway Hub Guide](docs/gateway-hub.md)** | Build a market-based hub with Claude Task/Mailbox bridge for Claude/Gemini/Copilot/Codex orchestration |
 
 Also see: [CONTRIBUTING.md](CONTRIBUTING.md) · [MCP Server README](mcp-server/README.md)
 
@@ -443,5 +486,3 @@ Contributions to documentation, the MCP server, and exploration tooling are welc
 ## Disclaimer
 
 This repository archives source code leaked from Anthropic's npm registry on **2026-03-31**. All original source code is the property of [Anthropic](https://www.anthropic.com). This is not an official release and is not licensed for redistribution. Contact [nichxbt](https://www.x.com/nichxbt) for any comments.
-
-

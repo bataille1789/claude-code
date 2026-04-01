@@ -4274,12 +4274,30 @@ async function run(): Promise<CommanderCommand> {
     await setupTokenHandler(root);
   });
 
+  // Team command - relaunch in multi-agent teammate mode
+  program.command('team').description('Start Claude with the multi-agent teammate system enabled').option('-c, --config <path>', 'Load team settings from a JSON/YAML wrapper config').option('--dry-run', 'Print the generated wrapped command without executing it').argument('[args...]', 'Arguments forwarded to Claude (use -- before flags)').allowUnknownOption(true).allowExcessArguments(true).action(async (args: string[] = [], options: {
+    config?: string;
+    dryRun?: boolean;
+  }) => {
+    const {
+      teamHandler
+    } = await import('./cli/handlers/team.js');
+    await teamHandler(args, options);
+  });
+
   // Agents command - list configured agents
   program.command('agents').description('List configured agents').option('--setting-sources <sources>', 'Comma-separated list of setting sources to load (user, project, local).').action(async () => {
     const {
       agentsHandler
     } = await import('./cli/handlers/agents.js');
     await agentsHandler();
+    process.exit(0);
+  });
+  program.command('gateway').description('Run the multi-provider gateway hub (market router + policy + event log)').allowUnknownOption(true).argument('[args...]', 'Gateway args (e.g. --config gateway.yaml --prompt \"...\")').action(async (args: string[] = []) => {
+    const {
+      gatewayMain
+    } = await import('./gateway/cli.js');
+    await gatewayMain(args);
     process.exit(0);
   });
   if (feature('TRANSCRIPT_CLASSIFIER')) {
